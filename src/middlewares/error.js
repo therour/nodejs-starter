@@ -27,6 +27,7 @@ const errorMiddleware = (err, req, res, next) => {
 
   res.locals.errorMessage = message;
 
+  /** istanbul ignore next */
   if (config.app.env === 'development') {
     logger.error(error);
   }

@@ -3,13 +3,12 @@ const ApiError = require('../common/errors/api-error');
 const logger = require('../common/logger');
 const config = require('../configs/config');
 
-const isApiError = (ins) => ins instanceof ApiError;
-
 const convertError = (err) => {
   let error = err;
-  if (!isApiError(error)) {
+  if (!(error instanceof ApiError)) {
     const statusCode = httpStatus.INTERNAL_SERVER_ERROR;
-    const message = error.message || httpStatus[statusCode];
+    /* istanbul ignore next */
+    const message = err.message || httpStatus[statusCode];
     error = new ApiError(statusCode, message, undefined, false, error.stack);
   }
   return error;
@@ -21,14 +20,13 @@ const errorMiddleware = (err, req, res, next) => {
 
   let { message } = error;
   const { statusCode, payload, stack } = error;
-  if (config.app.env === 'production' && !err.isOperational) {
+  if (config.app.env === 'production' && !error.isOperational) {
     message = httpStatus[statusCode];
   }
 
   res.locals.errorMessage = message;
 
-  /** istanbul ignore next */
-  if (config.app.env === 'development') {
+  if (!error.isOperational) {
     logger.error(error);
   }
 

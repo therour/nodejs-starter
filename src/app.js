@@ -14,6 +14,7 @@ const app = express();
 
 // set morgan http logger
 if (config.app.env !== 'test') {
+  app.set('trust proxy', true);
   app.use(morgan.successHandler);
   app.use(morgan.errorHandler);
 }
